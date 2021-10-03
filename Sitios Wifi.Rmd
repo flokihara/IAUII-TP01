@@ -7,14 +7,14 @@ date: "09/10/2021"
   # Trabajo Práctico 01: Sitios Wifi en Ciudad de Buenos Aires
   **Florencia Kihara**
   
-  *Este trabajo tiene por objetivo presentar y analizar la ubicación de sitios de wifi disponibles en espacios públicos de la Ciudad de Buenos Aires, como servicio a la comunidad, a partir de la base de datos obtenida en BA Data*
+  *OBJETIVO:Este trabajo tiene por objetivo presentar y analizar la ubicación de sitios de wifi disponibles en espacios públicos de la Ciudad de Buenos Aires, como servicio a la comunidad, a partir de la base de datos obtenida en BA Data*
 
 ```{r}
 library(tidyverse)
 library(modeest)
 library(RColorBrewer)
 ```
-
+Para cumplir con el objetivo, realizaremos un análisis preliminar del dataset "Sitioswifi.csv"
   
 ```{r}
 SW <- read.csv("data/sitioswifi.csv",
@@ -22,7 +22,6 @@ SW <- read.csv("data/sitioswifi.csv",
                encoding = "UTF-8")
 ```
 
-## Análisis de las columnas y las filas 
 ```{r}
 dim(SW)
 ```
@@ -33,7 +32,6 @@ nrow(SW)
 ```{r}
 ncol(SW)
 ```
-
 
 De esta forma, se puede observar que la base de datos utilizada posee 897 filas y 17 columnas.
 
@@ -304,4 +302,4 @@ mfv(Filtro1$tipo)
 ```
 De esta forma, se evidencia que en el Sur de la Ciudad (Concatenar1) el tipo de espacio donde hay más sitios de wifi disponible es el "Espacio Público". Mientras que haciendo el mismo análisis para toda la Ciduad (Filtro1), obtenemos que la moda son los Hospitales y los centros de Salud. 
 
-
+Nota al pie: este trabajo fue iniciado en el curso de Análisis de Datos 1 y complementado con herramientas vistas en el curso de Instrumentos de Análisis Urbano II.
