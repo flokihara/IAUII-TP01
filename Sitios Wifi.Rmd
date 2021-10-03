@@ -1,0 +1,307 @@
+---
+  title: "Sitios Wifi - TP01 - Instrumentos de Análisis Urbano II"
+author: "Florencia Kihara"
+date: "09/10/2021"
+output: html_document
+---
+  # Trabajo Práctico 01: Sitios Wifi en Ciudad de Buenos Aires
+  **Florencia Kihara**
+  
+  *Este trabajo tiene por objetivo presentar y analizar la ubicación de sitios de wifi disponibles en espacios públicos de la Ciudad de Buenos Aires, como servicio a la comunidad, a partir de la base de datos obtenida en BA Data*
+
+```{r}
+library(tidyverse)
+library(modeest)
+library(RColorBrewer)
+```
+
+  
+```{r}
+SW <- read.csv("data/sitioswifi.csv",
+               stringsAsFactors = TRUE,
+               encoding = "UTF-8")
+```
+
+## Análisis de las columnas y las filas 
+```{r}
+dim(SW)
+```
+
+```{r}
+nrow(SW)
+```
+```{r}
+ncol(SW)
+```
+
+
+De esta forma, se puede observar que la base de datos utilizada posee 897 filas y 17 columnas.
+
+```{r}
+names(SW)
+```
+Los nombres de las 17 columnas mencionadas anteriormente son:
+  1. Long; 2. Lat; 3. ID; 4. Nombre; 5. Tipo; 6. Etapa; 7. Etapa_Obse; 8. Estado; 9. Subcategor; 10. Calle_nombre; 11. Calle_altura; 12. Calle_cruce; 13. Barrio; 14. Comuna; 15. Codigo_postal; 16. Codigo_postal_argentino y 17. Objeto.
+
+
+## Análisis del encabezado de la base de datos
+```{r}
+head(SW)
+```
+A través de esta vista previa, se puede obsevar: 
+  
+  - La base de datos cuenta con información de latitud y longitud de cada sitio de wifi
+
+- Cada sitio de wifi cuenta con un número de identificación (ID)
+
+- Se especifica el nombre del espacio donde se encuentra el punto de conexión a wifi.
+
+- Se indica el tipo de espacio (deporte, gobierno, etc.) donde se encuentra el sitio de wifi. Además, se podría considerar que la información de la columna 9 se relaciona con la de la columna 5, ya que en la 9 se detalla la categoría del edificio (Polideportivos, edificios del Gobierno de la Ciudad, etc.) donde se encuentra el sitio de wifi.
+
+- En la columna 6 "etapa" no se posee datos para las primeras 6 filas. 
+
+- En "etapa observada", se podría inferir que se indica el año de relevamiento del dato
+
+- En la columna 8 "estado" se detalla el estado de la red de wifi
+
+- En las columnas 10 "calle_nombre", 11 "calle_altura", 15 "codigo_postal" y 16 "codigo_postal_argentino" se indican las direcciones (nombre de la calle, altura y código postal) de los espacios donde se encuentran los puntos de wifi.
+
+- En la columna 12 "calle_cruce" no se posee datos para las primeras 6 filas. 
+
+- En la columna 13 "barrio" y en la 14 "comuna", se detalla el nombre del barrio y de la comuna de los sitios de wifi.
+
+- La columna 17 "objeto" se indica el objeto relevado a través de esta fuente de datos "SITIOS WIFI". 
+
+## Resumen de información
+```{r}
+summary(SW)
+```
+
+A partir de esta información, se puede concluir lo siguiente: 
+  
+  - En el caso de la latitud y longitud se presenta información sobre la media, la mediana,  el primer, el tercer cuatril y mínimos y máximos de la ubicación de los sitios de wifi.
+
+- En el caso de las variables ID y nombre se presenta información que no resulta de utilidad para este análisis.
+
+- De los 897 puntos de wifi, se evidencia que la mayoría se encuentran en las categorías denominadas: espacios públicos (208); hospitales y centros de salud (203) y parques y plazas (127).
+
+- En cuanto a la información sobre la etapa, se puede observar que esta categoría está vacía para 220 filas, tal como ocurre en las primeras 6 filas analizadas en el punto anterior. Además, se evidencia que 410 sitios de wifi fueron ejecutados antes de la gestión de HRL (Horacio Rodríguez Larreta). 
+
+- Se puede observar que en la mayoría de los sitios el wifi está disponible (880), mientras que solamente en 17 puntos no lo está. 
+
+- La información de la columna 9 (subcategor) evidencia que la mayoría de los puntos se encuentran en parques y plazas (108).
+
+- En cuanto al nombre de la calle donde se encuentran los sitios de wifi, se puede observar que para 31 casos no hay información y que la calle con más puntos es Cabildo (23).
+
+- En cuanto a la información sobre calle_cruce, se puede observar que esta categoría está vacía para 648 filas, tal como ocurre en las primeras 6 filas analizadas en el punto anterior.
+
+- El barrio que más sitios de wifi posee es San Nicolás (78). A su vez, esta información guarda relación con el hecho de que la comuna que más sitios de wifi posee es la comuna 1 (163), ya que el barrio San Nicolás forma parte de dicha comuna.
+
+- En el caso de código_postal, la información provista no resulta de utilidad ya que se presenta la media, la mediana, el mínimo y máximo, etc. 
+
+- En el caso del código_postal_argentino, se puede observar que hay una gran cantidad de datos vacíos (294) para esta variable. 
+
+
+## Resumen de información presente en las columnas más relevantes
+Con los siguientes análisis es posible analizar en detalle algunas de las columnas más reelvantes mencionadas anteriormente. 
+
+```{r}
+summary(SW$tipo)
+```
+De esta forma, se puede conocer, por ejemplo, que 1 transporte posee un sitio de wifi.
+
+```{r}
+summary(SW$subcategor)
+```
+A través de esta información, se evidencia, por ejemplo, que hay un sitio de wifi en el zoológico y que hay 6 sitios en el planetario. También, estos datos permiten conocer que la línea de subte que posee menor cantidad de sitios de wifi es la línea C (9 sitios de wifi)
+
+```{r}
+summary(SW$barrio)
+```
+A través de esta información, se observa que los barrios que poseen menor cantidad de sitios wifi (2 sitios) son: Villa Real, Agronomía y Versalles; aunque sería necesario conocer a qué barrios pertenecen los 35 sitios que no poseen información para esta variable. 
+
+```{r}
+summary(SW$comuna)
+```
+A partir de esta operación, se puede conocer que la comuna que posee menor cantidad de sitios wifi es la COmuna 5 (posee 26 sitios); aunque sería necesario conocer a qué comunas pertenecen los 35 sitios que no poseen información para esta variable. 
+
+
+## Análisis de la estructura de las columnas
+```{r}
+str(SW)
+```
+
+
+En la estructura de la presente base de datos, encontramos 3 tipos de datos: numeric (por ejemplo, para las variables longitud y latitud); integer (es decir, que solo admite números enteros como por ejemplo en ID y altura de la calle) y factor (que son textos, como por ejemplo calle_nombre y barrio)
+
+
+```{r}
+str(SW$subcategor)
+```
+
+A través del proceso anterior, se puede observar la estructura de cada columna en particular. Por ejemplo, en este caso, se analizó la columna titulada subcategor. El tipo de sus datos es factor, ya que admite textos (tal como se observó en el punto anterior también). No es necesario realizar este análisis para el resto de las variables ya que en el punto anterior se obtuvo dicha información.  
+
+
+```{r}
+Filtro1 <- filter(SW, estado %in% c ("Disponible", "Dsiponible"))
+```
+
+El objetivo del Filtro1 es filtrar aquellos sitios de wifi que están disponibles en la Ciudad de Buenos Aires. Se ha utilizado la operación de filtro con dos categorías ("Disponible" y "Dsiponible") porque se ha detectado un error de tipeo en la palabra "Disponible" en la base original. 
+
+Para corroborar el filtro, se presenta a continuación el encabezado.
+
+```{r}
+head(Filtro1)
+```
+
+## Filtro 2
+
+Ahora se realiará el filtro2 con el fin de conocer los sitios de wifi disponibles en los barrios del Sur de la Ciudad de Buenos Aires (La Boca;Barracas;Nueva Pompeya, Villa Riachuelo, Villa Soldati, Villa Lugano y Mataderos según fuente GCBA)en los polideportivos relevados, con el fin de conocer el acceso a wifi disponible para la población de dicha zona.
+
+```{r}
+Filtro2<-filter(Filtro1,barrio %in% c("La Boca", "Barracas", "Nueva Pompeya", "Villa Riachuelo", "Villa Soldati", "Villa Lugano", "Mataderos") & subcategor== "Polideportivos")
+```
+
+```{r}
+head(Filtro2)
+```
+De esta forma, se evidencia que solamente hay un polideportivo del Sur de la Ciudad que cuenta con un sitio de wifi disponible. 
+
+## Selección
+
+Con el objetivo de disponer de la información de utilidad para este análisis y los siguientes, se realiza una selección de las columnas que resultan de interés, con el fin de no considerar "long", "lat", "id", "calle_cruce", codigo_postal", "codigo_postal_argentino" y "objeto". Trabajaremos sobre Filtro1 para estudiar solamente los puntos con wifi disponible en toda la Ciudad.  
+
+```{r}
+Seleccion1 <- select(Filtro1, 4:14, -12)
+```
+
+Para corroborar la selección, se mostrarán los nombres de las columnas que quedaron seleccionadas. 
+
+```{r}
+names(Seleccion1)
+```
+
+Como se puede observar, las columnas que forman parte de la selección son: 1. "nombre", 2. "tipo", 3. "etapa", 4. "etapa_obse", 5. "estado", 6. "subcategor", 7. "calle_nombre", 8. "calle_altura", 9."barrio", 10. "comuna". 
+
+
+Ahora, haremos una selección de las columnas que poseen contenido numérico sobre la base SW. 
+
+```{r}
+Seleccion2 <- select (SW, where(is.numeric))
+```
+
+A continuación, se listarán las columnas que quedaron dentro de la Selección 2, es decir, que tienen contenido numérico.
+
+```{r}
+names(Seleccion2)
+```
+
+
+Habiendo detectado un error de tipeo en la columna 5 "estado" de la base Selección1, crearemos una nueva columna titulada "estado2" que busca subsanar y homogeneizar el tipeo de la categoría "disponible" para facilitar la manipulación futura de la base. 
+
+```{r}
+Mutacion1 <- mutate(Seleccion1, estado2="DISPONIBLE")
+```
+
+Por último, crearemos una nueva columna que posea la información conjunta de la Comuna y el barrio donde se encuentra el sitio de wifi.
+
+```{r}
+Mutacion2 <- mutate(Mutacion1, comuna_barrio=paste(comuna, barrio, sep = "_"))
+```
+
+
+```{r}
+OrdenCP <- arrange(Filtro1, codigo_postal)
+```
+
+Ahora se corroborará el orden establecido.
+
+```{r}
+head(OrdenCP)
+```
+
+
+Ahora, renombraremos algunas columnas de la Selección1 con el fin de esclarecer la información contenida en ellas. 
+
+```{r}
+RenombreS2 <- (rename(Seleccion1, nombre_del_sitio=nombre, subtipo=subcategor))
+```
+
+Corroboraremos el nombre de las columnas
+
+```{r}
+names(RenombreS2)
+```
+Verificamos que las columnas 1. "nombre_del_sitio" y 6. "subtipo" han cambiando su denominación. 
+
+
+
+```{r}
+Grupo1 <- group_by(RenombreS2, tipo, subtipo)
+```
+
+```{r}
+Resumen <- summarise(Grupo1)
+```
+
+```{r}
+Concatenar1 <- SW %>%
+  filter(estado %in% c ("Disponible", "Dsiponible")) %>% 
+select(5,6,9,8,13,14) %>% 
+filter(!(tipo %in% c("Gobierno") & subcategor %in% c ("Edificios del GCABA"))) %>% 
+filter(etapa %in% c("Ejecutados 2017", "Gestión previa HRL", "Primera etapa HRL", "Segunda etapa HRL", "Segunda Etapa HRL") & barrio %in% c("La Boca", "Barracas", "Nueva Pompeya", "Villa Riachuelo", "Villa Soldati", "Villa Lugano", "Mataderos")) %>% 
+  arrange(barrio)
+```
+
+
+```{r}
+head(Concatenar1)
+```
+
+Con el fin de conocer cuándo fueron instalados los sitios de wifi en el Sur de la Ciudad, se utilizará el proceso summary para la variable etapa.
+
+```{r}
+summary(Concatenar1$etapa)
+```
+De esta forma, se puede observar que la mayoría de los sitios de wifi disponibles en el Sur de la Ciudad fueron instalaron en la gestión previa a la de Horacio Rodríguez Larreta (67). De todos modos, se evidencia avances en la instalación de sitios de wifi durante la segunda etapa de la gestión de Horacio Rodríguez Larreta (27+1=28).
+
+```{r}
+summary(Concatenar1$barrio)
+```
+Con esta información, podemos observar que la cantidad de sitios wifi por cada barrio del Sur de la Ciudad:
+
+- Barracas 23;
+
+- Mataderos 7;
+
+- Villa Lugano 22;
+
+- Villa Riachuelo: 4;
+
+- Nueva Pompeya: 11 y
+
+- Villa Soldati: 28
+
+
+
+```{r}
+mfv(Concatenar1$barrio)
+```
+
+```{r}
+mfv(Filtro1$barrio)
+```
+
+Aplicando el proceso para conocer la moda en la variable barrio en Concatenar1, podemos ver que el barrio con más sitios de wifi disponibles es Villa Soldati. Ahora bien, resulta interesante comparar este dato con los disponibles en Filtro1, donde el barrio con más cantidad de sitios wifi disponibles es San Nicolás. 
+
+Ahora, haremos el mismo análisis para la variable tipo.
+```{r}
+mfv(Concatenar1$tipo)
+```
+
+```{r}
+mfv(Filtro1$tipo)
+```
+De esta forma, se evidencia que en el Sur de la Ciudad (Concatenar1) el tipo de espacio donde hay más sitios de wifi disponible es el "Espacio Público". Mientras que haciendo el mismo análisis para toda la Ciduad (Filtro1), obtenemos que la moda son los Hospitales y los centros de Salud. 
+
+
